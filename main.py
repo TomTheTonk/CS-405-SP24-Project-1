@@ -20,7 +20,6 @@ def CPUUsage():
 #File Processing
 def fileOpen(fileName):
         operationList = []
-        index = 3
         if fileName.endswith('.txt'):
             file = open(fileName)
             while True:
@@ -28,8 +27,9 @@ def fileOpen(fileName):
                 IOBurst = []
                 operationDict = {}
                 unkeyedList = file.readline().split()
+                index = 3
+                print(unkeyedList)
                 if unkeyedList != []:
-                    print(unkeyedList)
                     name = unkeyedList[0]
                     arrival = unkeyedList[1]
                     priority = unkeyedList[2]
@@ -46,6 +46,7 @@ def fileOpen(fileName):
         else:
              return None
 
-print(fileOpen("TestFiles/test1.txt"))
+
+print(fileOpen("TestFiles/testio.txt"))
  
 
