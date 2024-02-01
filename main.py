@@ -1,15 +1,14 @@
-from operator import itemgetter
 #Algorithims
 def FCFS(file): 
     #Sorts the the list by arrival
-    file = sorted(file, key=itemgetter("arrival"))
+    file = sorted(file, key=lambda x: x['priority'])
     return file
 def SJF(file):
     
     return file
 def PS(file):
     #sorts the list by its priority
-    file = sorted(file, key=itemgetter("priority"))
+    file = sorted(file, key=lambda x: x['priority'])
     return file
 #Stats
 def CPUUsage():
@@ -28,7 +27,6 @@ def fileOpen(fileName):
                 operationDict = {}
                 unkeyedList = file.readline().split()
                 index = 3
-                print(unkeyedList)
                 if unkeyedList != []:
                     name = unkeyedList[0]
                     arrival = unkeyedList[1]
@@ -46,7 +44,8 @@ def fileOpen(fileName):
         else:
              return None
 
+print(PS(fileOpen("TestFiles/test1.txt")))
+print(fileOpen("TestFiles/test1.txt"))
 
-print(fileOpen("TestFiles/testio.txt"))
  
 
