@@ -1,7 +1,10 @@
 #Algorithims
+from operator import itemgetter
+
+
 def FCFS(file): 
     #Sorts the the list by arrival
-    file = sorted(file, key=lambda x: x['priority'])
+    file = sorted(file, key=lambda x: x['arrival'])
     return file
 def SJF(file):
     
@@ -11,9 +14,11 @@ def PS(file):
     file = sorted(file, key=lambda x: x['priority'])
     return file
 #Stats
-def CPUUsage():
-    return None
+def CPUUsage(file, index):
+    return list(map(itemgetter('CPUBurst'), file))[index]
 
+def IOBurst(file, index):
+    return list(map(itemgetter('IOBurst'), file))[index]
 #Interface
 
 #File Processing
@@ -45,7 +50,7 @@ def fileOpen(fileName):
              return None
 
 print(PS(fileOpen("TestFiles/test1.txt")))
-print(fileOpen("TestFiles/test1.txt"))
+print(CPUUsage(fileOpen("TestFiles/test1.txt"), 0))
 
  
 
