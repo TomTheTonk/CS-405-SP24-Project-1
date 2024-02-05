@@ -34,12 +34,12 @@ def fileOpen(fileName):
                 index = 3
                 if unkeyedList != []:
                     name = unkeyedList[0]
-                    arrival = unkeyedList[1]
-                    priority = unkeyedList[2]
+                    arrival = int(unkeyedList[1])
+                    priority = int(unkeyedList[2])
                     while index <= len(unkeyedList):
-                        CPUBurst.append(unkeyedList[index])
+                        CPUBurst.append(int(unkeyedList[index]))
                         if index + 1 < len(unkeyedList):
-                            IOBurst.append(unkeyedList[index + 1])
+                            IOBurst.append(int(unkeyedList[index + 1]))
                         index = index + 2
                 else:
                     break
@@ -48,9 +48,9 @@ def fileOpen(fileName):
             return operationList
         else:
              return None
-
-print(PS(fileOpen("TestFiles/test1.txt")))
-print(CPUUsage(fileOpen("TestFiles/test1.txt"), 0))
+print((fileOpen("TestFiles/test1.txt")))
+print((PS(fileOpen("TestFiles/test1.txt"))))
+print(FCFS(PS(fileOpen("TestFiles/test1.txt"))))
 
  
 
