@@ -5,10 +5,20 @@ from operator import itemgetter
 def FCFS(file): 
     #Sorts the the list by arrival
     file = sorted(file, key=lambda x: x['arrival'])
-    return file
-def SJF(file):
     
     return file
+
+def get_Arrival_Time(operationList):
+    return operationList['arrival']
+
+def SJF(file):
+    file = sorted(file, reverse=False, key=lambda x: x['arrival'])
+    
+
+    return file
+
+
+
 def PS(file):
     #sorts the list by its priority
     file = sorted(file, key=lambda x: x['priority'])
@@ -34,7 +44,7 @@ def fileOpen(fileName):
                 index = 3
                 if unkeyedList != []:
                     name = unkeyedList[0]
-                    arrival = unkeyedList[1]
+                    arrival = int(unkeyedList[1])
                     priority = unkeyedList[2]
                     while index <= len(unkeyedList):
                         CPUBurst.append(unkeyedList[index])
@@ -45,12 +55,14 @@ def fileOpen(fileName):
                     break
                 operationDict = {"name": name, "arrival":arrival, "priority": priority, "CPUBurst": CPUBurst, "IOBurst": IOBurst}
                 operationList.append(operationDict)
+                
             return operationList
         else:
              return None
 
-print(PS(fileOpen("TestFiles/test1.txt")))
-print(CPUUsage(fileOpen("TestFiles/test1.txt"), 0))
+#print(PS(fileOpen("TestFiles/test1.txt")))
+#print(CPUUsage(fileOpen("TestFiles/test1.txt"), 0))
+#print(FCFS(fileOpen("TestFiles/test1.txt")))
+print(SJF(fileOpen("TestFiles/test1.txt")))
 
- 
 
