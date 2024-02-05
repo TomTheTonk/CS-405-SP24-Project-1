@@ -6,13 +6,16 @@ def FCFS(file):
     #Sorts the the list by arrival
     file = sorted(file, key=lambda x: x['arrival'])
     return file
+  
 def SJF(file):
-    
+    file = sorted(file, reverse=False, key=lambda x: x['arrival'])
     return file
+
 def PS(file):
     #sorts the list by its priority
     file = sorted(file, key=lambda x: x['priority'])
     return file
+  
 #Stats
 def CPUUsage(file, index):
     return list(map(itemgetter('CPUBurst'), file))[index]
@@ -45,6 +48,7 @@ def fileOpen(fileName):
                     break
                 operationDict = {"name": name, "arrival":arrival, "priority": priority, "CPUBurst": CPUBurst, "IOBurst": IOBurst}
                 operationList.append(operationDict)
+                
             return operationList
         else:
              return None
@@ -52,5 +56,5 @@ print((fileOpen("TestFiles/test1.txt")))
 print((PS(fileOpen("TestFiles/test1.txt"))))
 print(FCFS(PS(fileOpen("TestFiles/test1.txt"))))
 
- 
+
 
