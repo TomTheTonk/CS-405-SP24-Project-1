@@ -31,10 +31,85 @@ def IOBurst(file, index):
 #Interface
 
 
+#Queue
+def queue(file):
+    while file != []:
+
+        file.pop()
+def saveFiles(file):
+    with open('tester.txt', 'w') as f:
+        for line in file:
+            f.write("%s\n" % line)
+    print("Saved to tester.txt")
+
+def termRun():
+    algorithim = 0
+    file = None
+    print("Enter Simulation Mode 0(Auto) or 1(Manual)")
+    mode = int(input())
+    if mode != 1 and mode != 0:
+        raise Exception("Mode Must be 0 or 1")
+    print("Enter simulation unit time")
+    simTime = int(input())
+    print("Enter Time Slice for RR")
+    timeSlice = int(input())
+
+    while(True):
+        print("--------------------------------------------------")
+        print("Simulation Mode is ", mode, " Simulation Unit Time is ", simTime,  " Time Slice is ", timeSlice)
+        print("--------------------------------------------------")
+        if file != None:
+           [print(i) for i in file]
+        else:
+            print("No File to Run")
+        print("--------------------------------------------------")
+        print("Select an option")
+        print("1. Input A File")
+        print("2. Select Algorithim")
+        print("3. Run File")
+        print("4. Save Files")
+        print("5. Quit")
+        print("--------------------------------------------------")
+        selection = int(input())
+        
+        match(selection):
+            case 1: 
+                print("Enter A Test File")
+                file = input()
+                file = fileOpen(file)
+
+            case 2:
+                print("Select an Algorthim")
+                print("FCFS 0 (Default)")
+                print("SJF 1")
+                print("PS 2")
+                print("RR 3")
+                algorithim = int(input())
+                match(algorithim):
+                    case 0: 
+                        print("FCFS selected")
+                        
+                    case 1: 
+                        print("SJF selected")
+                        
+                    case 2: 
+                        print("PS selected")
+                        
+                    case 3: 
+                        print("RR selected")
+                        
+            case 3:
+                queue(file)
+            case 4:
+                saveFiles(file)
+            case 5:
+                break
+
 
 #File Processing
 def fileOpen(fileName):
         operationList = []
+        PID = 1
         if fileName.endswith('.txt'):
             file = open(fileName)
             while True:
@@ -54,13 +129,14 @@ def fileOpen(fileName):
                         index = index + 2
                 else:
                     break
-                operationDict = {"name": name, "arrival":arrival, "priority": priority, "CPUBurst": CPUBurst, "IOBurst": IOBurst}
+                operationDict = {"name": name, "PID": PID, "arrival":arrival, "priority": priority, "CPUBurst": CPUBurst, "IOBurst": IOBurst, "State": "New", "arrivalTime": None, "finishTime": None, "turnAround": None, "waitTime": None, "IOwaitTime": None}
+                PID = PID + 1
                 operationList.append(operationDict)
                 
             return operationList
         else:
              return None
-        
+
 
 #Round Robing stuff
 def RR(queue):
