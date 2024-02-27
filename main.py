@@ -4,6 +4,43 @@ from operator import itemgetter
 #Quantum should be 0 by default 
 Quantum = 1
 
+def getStartTime(time):
+     return time
+
+def setTime(time, t):
+     time._age = t
+
+
+
+currentTime = property(getStartTime, setTime)
+
+
+
+
+#PCB
+def PCB():
+        name = fileOpen(key=lambda x: x['name'])
+        identity = int
+        arrivalTime = fileOpen(key=lambda x: x['arrival'])
+        cpuBurst = fileOpen(key=lambda x: x['CPUBurst'])
+        priority = fileOpen(key=lambda x: x['priority'])
+
+        startTime = int
+        finishTime = int
+        turnAroundTime = int
+        waitingTime = int
+
+
+
+        
+processOne = PCB()
+
+
+
+
+
+
+     
 
 def FCFS(file): 
     #Sorts the the list by arrival
@@ -106,7 +143,7 @@ def termRun():
                 break
 
 
-#File Processing
+#File Processing, Think of this like the Driver class in Lab 4 :)
 def fileOpen(fileName):
         operationList = []
         PID = 1
@@ -138,9 +175,59 @@ def fileOpen(fileName):
              return None
 
 
+
+#Scheduler
+def scheduler():
+        name = fileOpen(key=lambda x: x['name'])  #Name of algorithm
+        processes = [] #Queue of processes
+        readyOrNotHereIComeQueue = [] # ready Queue
+        completedProcs = [] #Queue of complete processes
+        curProc = " "
+        systemTime = int 
+
+       
+#While loop to state when process should be moved to readyQueue
+        while not processes.empty() or not readyOrNotHereIComeQueue.empty() :
+             print("System Time: " + systemTime)
+
+             for p in processes:
+                  if fileOpen(key=lambda x: x['arrival'] == systemTime):
+                        readyOrNotHereIComeQueue.append(str(p))
+                        #readyOrNotHereIComeQueue.append(p)
+
+
+        processes.removeAll(readyOrNotHereIComeQueue)
+        curProc = p
+        print()
+
+        if curProc == (fileOpen(key=lambda x: x['arrival']) < 0):
+                curProc.setStartTime(systemTime)
+                exec(curProc, 1)
+
+        for p in readyOrNotHereIComeQueue:
+             if p != curProc:
+                  #Increase waiting time by 1
+                  p += 1
+        #increment systemTime by 1 unit          
+        systemTime += 1
+
+        #if the current processe's CPU burst is equal to 0
+        # set the curProc's finishTime to the systemTime
+        # remove the curProc from the readyQueue
+        # and add the curProc to the finishedProcs 
+       
+        curProc == readyOrNotHereIComeQueue.__getitem__(0) 
+       
+
+
+
+
+
+
+
 #Round Robing stuff
 def RR(queue):
-    readyQueue = queue.Queue()
+    readyQueue = []
    
     file = sorted(file, key=lambda x: x['CPUBurst'])
    
@@ -148,7 +235,7 @@ def RR(queue):
 
         if file.operationList.CPUBurst[x] > Quantum:
             #push the operation to the ready state queue?
-            file.operationList.CPUBurst[x].push(readyQueue)
+            file.operationList.CPUBurst[x].append(readyQueue)
 
         elif file.operationList.CPUBurst[x] < Quantum:
             continue
@@ -159,7 +246,7 @@ def RR(queue):
     return readyQueue
 #print((fileOpen("TestFiles/test1.txt")))
 #print((PS(fileOpen("TestFiles/test1.txt"))))
-#print(FCFS(PS(fileOpen("TestFiles/test1.txt"))))
-print(RR(fileOpen("TestFiles/test1.txt")))
+print(FCFS(PS(fileOpen("TestFiles/test1.txt"))))
+#print(RR(fileOpen("TestFiles/test1.txt")))
 
-
+print(scheduler)
