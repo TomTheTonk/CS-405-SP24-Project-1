@@ -1,46 +1,7 @@
-#Algorithims
-import queue
-from operator import itemgetter
-#Quantum should be 0 by default 
-Quantum = 1
 
-def getStartTime(time):
-     return time
+import os
+import time
 
-def setTime(time, t):
-     time._age = t
-
-
-
-currentTime = property(getStartTime, setTime)
-
-
-
-
-#PCB
-def PCB():
-        name = fileOpen(key=lambda x: x['name'])
-        identity = int
-        arrivalTime = fileOpen(key=lambda x: x['arrival'])
-        cpuBurst = fileOpen(key=lambda x: x['CPUBurst'])
-        priority = fileOpen(key=lambda x: x['priority'])
-
-        startTime = int
-        finishTime = int
-        turnAroundTime = int
-        waitingTime = int
-
-
-
-        
-processOne = PCB()
-
-
-
-
-
-
-     
 
 def FCFS(file): 
     #Sorts the the list by arrival
@@ -48,9 +9,7 @@ def FCFS(file):
     return file
   
 def SJF(file):
-    file = sorted(file, reverse=False, key=lambda x: x['arrival'])
-
-#time instance - 
+    file = sorted(file, reverse=False, key=lambda x: (x['State'] != "Terminated", x['CPUBurst'][0], x['arrival']))
 
     return file
 
@@ -60,51 +19,62 @@ def PS(file):
     return file
   
 #Stats
-def CPUUsage(file, index):
-    return list(map(itemgetter('CPUBurst'), file))[index]
 
-def IOBurst(file, index):
-    return list(map(itemgetter('IOBurst'), file))[index]
-#Interface
-
-
-#Queue
-def queue(file):
-    while file != []:
-
-        file.pop()
-def saveFiles(file):
-    with open('tester.txt', 'w') as f:
+def saveFiles(file, log):
+    print("Enter a name for the file to save the results to")
+    output = input()
+    output= output + ".txt"
+    with open(output, 'w') as f:
         for line in file:
             f.write("%s\n" % line)
-    print("Saved to tester.txt")
+        for line in log:
+            f.write("%s\n" % line)
+    print("Saved to", output)
 
 def termRun():
     algorithim = 0
     file = None
-    print("Enter Simulation Mode 0(Auto) or 1(Manual)")
+    log = []
+    print("Enter Simulation Mode as integer: Auto(0) or Manual(1)")
     mode = int(input())
     if mode != 1 and mode != 0:
         raise Exception("Mode Must be 0 or 1")
-    print("Enter simulation unit time")
+    
+    print("Enter simulation unit time: Frames-per-second(0) or Frames-per-ms(1)")
     simTime = int(input())
-    print("Enter Time Slice for RR")
+    if simTime != 1 and simTime != 0:
+        raise Exception("Must be 0 or 1")
+    
+    print("Enter Time Slice for RR:")
     timeSlice = int(input())
 
     while(True):
+        os.system('clear')
         print("--------------------------------------------------")
-        print("Simulation Mode is ", mode, " Simulation Unit Time is ", simTime,  " Time Slice is ", timeSlice)
+        print("Simulation Mode is:", mode, "(Auto(0) Manual(1)) Simulation Unit Time is:", simTime,  "Time Slice is:", timeSlice)
+        match(algorithim):
+                    case 0: 
+                        print("FCFS selected")
+                        
+                    case 1: 
+                        print("SJF selected")
+                        
+                    case 2: 
+                        print("PS selected")
+                        
+                    #case 3: 
+                    #    print("RR selected")
         print("--------------------------------------------------")
         if file != None:
            [print(i) for i in file]
         else:
-            print("No File to Run")
+            print("No processes to run")
         print("--------------------------------------------------")
         print("Select an option")
-        print("1. Input A File")
-        print("2. Select Algorithim")
-        print("3. Run File")
-        print("4. Save Files")
+        print("1. Input a File")
+        print("2. Select Algorithim(FCFS Default)")
+        print("3. Run Processes")
+        print("4. Save Output")
         print("5. Quit")
         print("--------------------------------------------------")
         selection = int(input())
@@ -117,10 +87,10 @@ def termRun():
 
             case 2:
                 print("Select an Algorthim")
-                print("FCFS 0 (Default)")
-                print("SJF 1")
-                print("PS 2")
-                print("RR 3")
+                print("FCFS: 0 (Default)")
+                print("SJF: 1")
+                print("PS: 2")
+                print("RR: 3")
                 algorithim = int(input())
                 match(algorithim):
                     case 0: 
@@ -136,14 +106,14 @@ def termRun():
                         print("RR selected")
                         
             case 3:
-                queue(file)
+                log, file = scheduler(file, log, mode, simTime)
             case 4:
-                saveFiles(file)
+                saveFiles(file, log)
             case 5:
                 break
 
 
-#File Processing, Think of this like the Driver class in Lab 4 :)
+#File Processing
 def fileOpen(fileName):
         operationList = []
         PID = 1
@@ -177,56 +147,327 @@ def fileOpen(fileName):
 
 
 #Scheduler
-def scheduler():
-        name = fileOpen(key=lambda x: x['name'])  #Name of algorithm
-        processes = [] #Queue of processes
-        readyOrNotHereIComeQueue = [] # ready Queue
-        completedProcs = [] #Queue of complete processes
-        curProc = " "
-        systemTime = int 
+def scheduler(file, algorithim, sim, simTime):
+    log = []
+    systemTime = 0
+    saved = [] 
+    for t in range(len(file)):
+        saved.append({"ID": file[t].get("PID"), "CPUTimes": sum(file[t].get("CPUBurst"))})
 
+    totalBurst = 0
+    match(algorithim):
+        case 0: 
+            file = FCFS(file)
+                        
+        case 1: 
+            file = SJF(file)
+                        
+        case 2: 
+            file = PS(file)
+
+    schedulerPrint(file, [], [], "")                    
+
+    for p in range(len(file)):
+        if file[p].get("State") == "New":
+            file[p].update({'State': "Ready"})
+            log.append(file[p].get("name") + " was added to ready queue")
+        
+    if algorithim != 1:
+        totalRun = 0
+        for p in range(len(file)):
+            oiTime = file[p].get("IOBurst") # list of oi times
+            cpuTime = file[p].get("CPUBurst") #list of cpu times
+            for i in range(len(cpuTime)):
+                totalRun = cpuTime[i] + totalRun
+            for i in range(len(oiTime)):
+                totalRun = oiTime[i] + totalRun
+            if cpuTime != []:
+                currCPU = cpuTime[0]
+            if oiTime != []:
+                currIO = oiTime[0]
+            try:
+                for i in range(totalRun):
+                    
+                    if (file[p].get("State") == "Ready" and cpuTime != []) or (file[p].get("State") == "Running" and oiTime == [] and cpuTime != []):
+                        if file[p].get("State") == "Ready":
+                            file[p].update({'State': "Running"})
+                            log.append(file[p].get("name") + " was added to the CPU")
+                        #print(file[p].get("name") + " was added to the CPU")
+                        if sim == 1:
+                                schedulerPrint(file, cpuTime, [], (log))
+                                time.sleep(1)
+                                systemTime = systemTime + 1
+                                currCPU = currCPU - 1
+                                cpuTime[0] = cpuTime[0] - 1
+                                file[p].update({'CPUBurst': cpuTime})
+                                input("Enter any key to continue: ")
+                                if cpuTime[0] == 0:
+                                    cpuTime.pop(0)
+                                
+                        else:
+                                schedulerPrint(file, cpuTime, [], (log))
+                                time.sleep(1)
+                                systemTime = systemTime + 1
+                                currCPU = currCPU - 1
+                                cpuTime[0] = cpuTime[0] - 1
+                                file[p].update({'CPUBurst': cpuTime})
+                                if cpuTime[0] == 0:
+                                    cpuTime.pop(0)
+                                
+                    elif file[p].get("State") == "Waiting" and oiTime != []: 
+                    
+                        log.append(file[p].get("name") + " was added to the IO")
+                        #print(file[p].get("name") + " was added to the IO")
+                        file[p].update({'State': "OIRunning"})
+                        if sim == 1:
+                                schedulerPrint(file, [], oiTime, (log))
+                                time.sleep(1)
+                                systemTime = systemTime + 1
+                                oiTime[0] = oiTime[0] - 1
+                                currIO = currIO - 1
+                                file[p].update({'OIBurst': oiTime})
+                                input("Enter any key to continue: ")
+                                if oiTime[0] == 0:
+                                    oiTime.pop(0)
+                                
+                        else:
+                                schedulerPrint(file, [], oiTime, (log))
+                                time.sleep(1)
+                                systemTime = systemTime + 1
+                                oiTime[0] = oiTime[0] - 1
+                                currIO = currIO - 1
+                                file[p].update({'IOBurst': oiTime})
+                                if oiTime[0] == 0:
+                                    oiTime.pop(0)
+                                
+
+                    if oiTime != [] and file[p].get("State") == "Running":
+                        file[p].update({'State': "Waiting"})
+                        log.append(file[p].get("name") + " was added to the waiting queue for the IO")
+                        #print(file[p].get("name") + " was added to the waiting queue for the IO")
+                        schedulerPrint(file, [], [], (log))
+                    elif cpuTime != [] and file[p].get("State") == "OIRunning":
+                        file[p].update({'State': "Ready"})
+                        log.append(file[p].get("name") + " was added to the ready queue")
+                        #print(file[p].get("name") + " was added to the ready queue")
+                        schedulerPrint(file, cpuTime, oiTime, (log))
+                    elif oiTime == [] and cpuTime == []:
+                        file[p].update({'State': "Terminated"})
+                        log.append(file[p].get("name") + " was added to terminated queue")
+                        #print(file[p].get("name") + " was added to terminated queue")
+
+                        if simTime == 1:
+                            file[p].update({'arrivalTime': str("0ms") })
+                            file[p].update({'finishTime': str(systemTime) + "ms"})
+                            file[p].update({'turnAround': str(systemTime)+"ms"})
+                            
+                            for q in range(len(saved)):
+                                if saved[q].get("ID") == file[p].get("PID"):
+                                    totalBurst = saved[q].get("CPUTimes") + totalBurst
+                                
+                            file[p].update({'waitTime': str((systemTime / totalBurst)) + "ms"})
+                            file[p].update({'IOwaitTime': str(0)+"ms"})
+
+                        elif simTime == 0:
+                            file[p].update({'arrivalTime': str("0.000s") })
+                            file[p].update({'finishTime': str(systemTime/1000.0) + "s"})
+                            file[p].update({'turnAround': str(systemTime/1000.0)+"s"})
+                            for q in range(len(saved)):
+                                if saved[q].get("ID") == file[p].get("PID"):
+                                    totalBurst = saved[q].get("CPUTimes") + totalBurst
+                            file[p].update({'waitTime': str((systemTime / totalBurst)/1000.0) + "ss"})
+                            file[p].update({'IOwaitTime': str(0)+ "s"})
+                        #"arrivalTime": None, "finishTime": None, "turnAround": None, "waitTime": None, "IOwaitTime": None}
+                        schedulerPrint(file, [], [], (log))
+                        break
+                        
+            except:
+                pause = input("Enter Stop to exit or enter any key to resume: ")
+                if pause == "Stop":
+                   break
+                else: 
+                    pass
+                        
+        schedulerPrint(file, [], [], (log))
+        return log, file
+    
+    else:
+        totalRun = []
+        for p in range(len(file)):
+            totalRun.extend(file[p].get("IOBurst")) # list of oi times
+            totalRun.extend(file[p].get("CPUBurst")) #list of cpu times)
        
-#While loop to state when process should be moved to readyQueue
-        while not processes.empty() or not readyOrNotHereIComeQueue.empty() :
-             print("System Time: " + systemTime)
+        for p in range(len(totalRun)):
+            terminated = []
+            for i in range(len(file)):
+                if file[i].get("State") == "Terminated":
+                    terminated.append(file[i])
+            file = [i for i in file if i not in terminated]
+            file = SJF(file)
+            file.extend(terminated)
+            oiTime = file[0].get("IOBurst") # list of oi times
+            cpuTime = file[0].get("CPUBurst") #list of cpu times
+            if cpuTime != []:
+                currCPU = cpuTime[0]
+            if oiTime != []:
+                currIO = oiTime[0]
+            try:
+                while(currIO != 0 or currCPU != 0):
+                    if (file[0].get("State") == "Ready" and cpuTime != []) or (file[0].get("State") == "Running" and oiTime == [] and cpuTime != []):
+                        if file[0].get("State") == "Ready":
+                            file[0].update({'State': "Running"})
+                            log.append(file[0].get("name") + " was added to the CPU")
+                        #print(file[p].get("name") + " was added to the CPU")
+                        if sim == 1:
+                                schedulerPrint(file, cpuTime, [], (log))
+                                time.sleep(1)
+                                systemTime = systemTime + 1
+                                currCPU = currCPU - 1
+                                cpuTime[0] = cpuTime[0] - 1
+                                file[0].update({'CPUBurst': cpuTime})
+                                input("Enter any key to continue: ")
+                                if cpuTime[0] == 0:
+                                    cpuTime.pop(0)
 
-             for p in processes:
-                  if fileOpen(key=lambda x: x['arrival'] == systemTime):
-                        readyOrNotHereIComeQueue.append(str(p))
-                        #readyOrNotHereIComeQueue.append(p)
+                        else:
+                                schedulerPrint(file, cpuTime, [], (log))
+                                time.sleep(1)
+                                systemTime = systemTime + 1
+                                currCPU = currCPU - 1
+                                cpuTime[0] = cpuTime[0] - 1
+                                file[0].update({'CPUBurst': cpuTime})
+                                if cpuTime[0] == 0:
+                                    cpuTime.pop(0)
+                       
+                    elif file[0].get("State") == "Waiting" and oiTime != []: 
+                    
+                        log.append(file[0].get("name") + " was added to the IO")
+                        #print(file[p].get("name") + " was added to the IO")
+                        file[0].update({'State': "OIRunning"})
+                        schedulerPrint(file, [], oiTime, (log))
+                        if sim == 1:
+                                schedulerPrint(file, [], oiTime, (log))
+                                time.sleep(1)
+                                systemTime = systemTime + 1
+                                oiTime[0] = oiTime[0] - 1
+                                currIO = currIO - 1
+                                file[0].update({'OIBurst': oiTime})
+                                input("Enter any key to continue: ")
+                                if oiTime[0] == 0:
+                                    oiTime.pop(0)
+                        else:
+                            
+                                schedulerPrint(file, [], oiTime, (log))
+                                time.sleep(1)
+                                systemTime = systemTime + 1
+                                oiTime[0] = oiTime[0] - 1
+                                currIO = currIO - 1
+                                file[0].update({'IOBurst': oiTime})
+                                if oiTime[0] == 0:
+                                    oiTime.pop(0)
 
+                    if oiTime != [] and file[0].get("State") == "Running":
+                        file[0].update({'State': "Waiting"})
+                        log.append(file[0].get("name") + " was added to the waiting queue for the IO")
+                        #print(file[p].get("name") + " was added to the waiting queue for the IO")
+                        schedulerPrint(file, [], [], (log))
+                    elif cpuTime != [] and file[0].get("State") == "OIRunning":
+                        file[0].update({'State': "Ready"})
+                        log.append(file[0].get("name") + " was added to the ready queue")
+                        #print(file[p].get("name") + " was added to the ready queue")
+                        schedulerPrint(file, cpuTime, oiTime, (log))
+                    elif oiTime == [] and cpuTime == []:
+                        file[0].update({'State': "Terminated"})
+                        log.append(file[0].get("name") + " was added to terminated queue")
+                        #print(file[p].get("name") + " was added to terminated queue")
+                        if simTime == 1:
+                            file[0].update({'arrivalTime': str("0ms") })
+                            file[0].update({'finishTime': str(systemTime) + "ms"})
+                            file[0].update({'turnAround': str(systemTime)+"ms"})
+                            for q in range(len(saved)):
+                                if saved[q].get("ID") == file[0].get("PID"):
+                                    totalBurst = saved[q].get("CPUTimes") + totalBurst
+                            file[0].update({'waitTime': str((systemTime / totalBurst)) + "ms"})
+                            file[0].update({'IOwaitTime': str(systemTime)+ "ms"})
+                        if simTime == 0:
+                            file[0].update({'arrivalTime': str("0.000s") })
+                            file[0].update({'finishTime': str(systemTime/1000.0) + "s"})
+                            file[0].update({'turnAround': str(systemTime/1000.0)+"s"})
+                            for q in range(len(saved)):
+                                if saved[q].get("ID") == file[0].get("PID"):
+                                    totalBurst = saved[q].get("CPUTimes") + totalBurst
+                            file[0].update({'waitTime': str((systemTime / totalBurst)/1000.0) + "s"})
+                            file[0].update({'IOwaitTime': str(0) + "s"})
+                        schedulerPrint(file, [], [], (log))
+                        break
 
-        processes.removeAll(readyOrNotHereIComeQueue)
-        curProc = p
-        print()
+                        #After each termination move the next shortest job to the front this is done in case the same process isnt the next shortest
+                        
+                    
 
-        if curProc == (fileOpen(key=lambda x: x['arrival']) < 0):
-                curProc.setStartTime(systemTime)
-                exec(curProc, 1)
-
-        for p in readyOrNotHereIComeQueue:
-             if p != curProc:
-                  #Increase waiting time by 1
-                  p += 1
-        #increment systemTime by 1 unit          
-        systemTime += 1
-
-        #if the current processe's CPU burst is equal to 0
-        # set the curProc's finishTime to the systemTime
-        # remove the curProc from the readyQueue
-        # and add the curProc to the finishedProcs 
+                    
+            except:
+                pause = input("\nEnter Stop to exit or enter any key to resume: ")
+                if pause == "Stop":
+                   break
+                else: 
+                    pass
+        schedulerPrint(file, [], [], (log))
+        return log, file
+    
+  
        
-        curProc == readyOrNotHereIComeQueue.__getitem__(0) 
-       
+def manualSimulation():
 
-
-
-
-
+    while(True):
+        next = input("Enter Next to continue: ")
+        if next == "Next":
+            break
+        
+def schedulerPrint(file, cpuTime, OItime, log):
+    readyQueue = []
+    oiQueue = []
+    cpu = []
+    oi =[]
+    terminated = []
+    os.system('clear')
+    for i in range(len(file)):
+        if file[i].get("State") == "Ready":
+            readyQueue.append(file[i].get("name"))
+        if file[i].get("State") == "Waiting":
+            oiQueue.append(file[i].get("name"))
+        if file[i].get("State") == "Running":
+            cpu.append(file[i].get("name"))
+        if file[i].get("State") == "OIRunning":
+            oi.append(file[i].get("name"))
+        if file[i].get("State") == "Terminated":
+            terminated.append(file[i].get("name"))
+    print("--------------------------------------------------" + "\nEnter C^C to Pause/Stop Simulation")
+    print("--------------------------------------------------")
+    print("Ready Queue: ", readyQueue)
+    print("OI Waiting Queue: ", oiQueue)
+    print("Process in CPU: ", cpu)
+    print("Process in OI: ", oi)
+    print("Terminated Queue: ", terminated)
+    print("--------------------------------------------------" )
+    if oi != [] and cpu != []:
+        print("CPU: ", cpuTime[0], " OI: ", OItime[0])
+    elif cpu == [] and oi == []:
+        print("CPU: Idle    ", " OI: Idle")
+    elif cpu == []:
+        print("CPU: Idle    ", " OI: ", OItime[0])
+    elif oi == []:
+        print("CPU: ", cpuTime[0], " OI: Idle")
+    print("--------------------------------------------------" )
+    [print(i) for i in file]
+    print("--------------------------------------------------" )
+    for i in log:
+            print(i)
+    print("--------------------------------------------------" )
 
 
 #Round Robing stuff
-def RR(queue):
+def RR(queue, Quantum):
     readyQueue = []
    
     file = sorted(file, key=lambda x: x['CPUBurst'])
@@ -246,7 +487,8 @@ def RR(queue):
     return readyQueue
 #print((fileOpen("TestFiles/test1.txt")))
 #print((PS(fileOpen("TestFiles/test1.txt"))))
-print(FCFS(PS(fileOpen("TestFiles/test1.txt"))))
+#print((fileOpen("TestFiles/test1.txt"))[1].get("State"))
+scheduler((fileOpen("TestFiles/testio.txt")), 1, 0, 1)
 #print(RR(fileOpen("TestFiles/test1.txt")))
+#termRun()
 
-print(scheduler)

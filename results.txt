@@ -1,0 +1,28 @@
+{'name': 'proc1', 'PID': 1, 'arrival': 3, 'priority': 2, 'CPUBurst': [], 'IOBurst': [], 'State': 'Terminated', 'arrivalTime': None, 'finishTime': None, 'turnAround': None, 'waitTime': None, 'IOwaitTime': None}
+{'name': 'proc2', 'PID': 2, 'arrival': 4, 'priority': 4, 'CPUBurst': [], 'IOBurst': [], 'State': 'Terminated', 'arrivalTime': None, 'finishTime': None, 'turnAround': None, 'waitTime': None, 'IOwaitTime': None}
+{'name': 'proc4', 'PID': 3, 'arrival': 10, 'priority': 3, 'CPUBurst': [], 'IOBurst': [], 'State': 'Terminated', 'arrivalTime': None, 'finishTime': None, 'turnAround': None, 'waitTime': None, 'IOwaitTime': None}
+proc1was added to ready queue
+proc2was added to ready queue
+proc4was added to ready queue
+proc1 was added to the CPU
+proc1 was added to the waiting queue for the IO
+proc1 was added to the IO
+proc1 was added to the ready queue
+proc1 was added to the CPU
+proc1 was added to the waiting queue for the IO
+proc1 was added to the IO
+proc1 was added to the ready queue
+proc1 was added to the CPU
+proc1 was added to terminated queue
+proc2 was added to the CPU
+proc2 was added to terminated queue
+proc4 was added to the CPU
+proc4 was added to the waiting queue for the IO
+proc4 was added to the IO
+proc4 was added to the ready queue
+proc4 was added to the CPU
+proc4 was added to the waiting queue for the IO
+proc4 was added to the IO
+proc4 was added to the ready queue
+proc4 was added to the CPU
+proc4 was added to terminated queue
