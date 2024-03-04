@@ -257,25 +257,24 @@ def scheduler(file, algorithim, sim, simTime):
                         #print(file[p].get("name") + " was added to terminated queue")
 
                         if simTime == 1:
-                            file[p].update({'arrivalTime': str("0ms") })
+                            file[p].update({'arrivalTime': str(file[p].get("arrival"))+"ms" })
                             file[p].update({'finishTime': str(systemTime) + "ms"})
-                            file[p].update({'turnAround': str(systemTime)+"ms"})
+                            file[p].update({'turnAround': str((systemTime - file[p].get("arrival")))+"ms"})
                             
                             for q in range(len(saved)):
                                 if saved[q].get("ID") == file[p].get("PID"):
                                     totalBurst = saved[q].get("CPUTimes") + totalBurst
-                                
+        
                             file[p].update({'waitTime': str((systemTime / totalBurst)) + "ms"})
                             file[p].update({'IOwaitTime': str(0)+"ms"})
-
                         elif simTime == 0:
-                            file[p].update({'arrivalTime': str("0.000s") })
-                            file[p].update({'finishTime': str(systemTime/1000.0) + "s"})
-                            file[p].update({'turnAround': str(systemTime/1000.0)+"s"})
+                            file[p].update({'arrivalTime': str(file[p].get("arrival")/1000.0)+"s" })
+                            file[p].update({'finishTime': str((systemTime)/1000.0) + "s"})
+                            file[p].update({'turnAround': str((systemTime - file[p].get("arrival"))/1000.0)+"s"})
                             for q in range(len(saved)):
                                 if saved[q].get("ID") == file[p].get("PID"):
                                     totalBurst = saved[q].get("CPUTimes") + totalBurst
-                            file[p].update({'waitTime': str((systemTime / totalBurst)/1000.0) + "ss"})
+                            file[p].update({'waitTime': str((systemTime - file[p].get("arrival") / totalBurst)/1000.0) + "s"})
                             file[p].update({'IOwaitTime': str(0)+ "s"})
                         #"arrivalTime": None, "finishTime": None, "turnAround": None, "waitTime": None, "IOwaitTime": None}
                         schedulerPrint(file, [], [], (log))
@@ -381,22 +380,22 @@ def scheduler(file, algorithim, sim, simTime):
                         log.append(file[0].get("name") + " was added to terminated queue")
                         #print(file[p].get("name") + " was added to terminated queue")
                         if simTime == 1:
-                            file[0].update({'arrivalTime': str("0ms") })
+                            file[0].update({'arrivalTime': str(file[p].get("arrival"))+"ms" })
                             file[0].update({'finishTime': str(systemTime) + "ms"})
                             file[0].update({'turnAround': str(systemTime)+"ms"})
                             for q in range(len(saved)):
                                 if saved[q].get("ID") == file[0].get("PID"):
                                     totalBurst = saved[q].get("CPUTimes") + totalBurst
-                            file[0].update({'waitTime': str((systemTime / totalBurst)) + "ms"})
+                            file[0].update({'waitTime': str((systemTime - file[0].get("arrival")) / totalBurst) + "ms"})
                             file[0].update({'IOwaitTime': str(systemTime)+ "ms"})
                         if simTime == 0:
-                            file[0].update({'arrivalTime': str("0.000s") })
+                            file[p].update({'arrivalTime': str(file[0].get("arrival")/1000.0)+"s" })
                             file[0].update({'finishTime': str(systemTime/1000.0) + "s"})
-                            file[0].update({'turnAround': str(systemTime/1000.0)+"s"})
+                            file[0].update({'turnAround': str((systemTime - file[0].get("arrival"))/1000.0)+"s"})
                             for q in range(len(saved)):
                                 if saved[q].get("ID") == file[0].get("PID"):
                                     totalBurst = saved[q].get("CPUTimes") + totalBurst
-                            file[0].update({'waitTime': str((systemTime / totalBurst)/1000.0) + "s"})
+                            file[0].update({'waitTime': str((((systemTime - file[0].get("arrival"))) / totalBurst)/1000.0) + "s"})
                             file[0].update({'IOwaitTime': str(0) + "s"})
                         schedulerPrint(file, [], [], (log))
                         break
