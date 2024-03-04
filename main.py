@@ -2,24 +2,53 @@
 import os
 import time
 
+"""
+    Sorts the processes by arrival to for FCFS
 
+    :param file: list of processes to be run on
+    :type: list of dictionaries
+    :return: file, list sorted by arrival time
+    :rtype: list
+    """
 def FCFS(file): 
     #Sorts the the list by arrival
     file = sorted(file, key=lambda x: x['arrival'])
     return file
-  
+"""
+    Sorts the processes by CPUBursts then by arrival time for SJF
+
+    :param file: list of processes to be run on
+    :type: list of dictionaries
+    :return: file, list sorted by CPUBursts time
+    :rtype: list
+    """
 def SJF(file):
-    file = sorted(file, reverse=False, key=lambda x: (x['State'] != "Terminated", x['CPUBurst'][0], x['arrival']))
-
+    file = sorted(file, reverse=False, key=lambda x: ( x['CPUBurst'][0], x['arrival']))
     return file
+"""
+    Sorts the processes by priority for PS
 
+    :param file: list of processes to be run on
+    :type: list of dictionaries
+    :return: file, list sorted by priority
+    :rtype: list
+    """
 def PS(file):
     #sorts the list by its priority
     file = sorted(file, key=lambda x: x['priority'])
     return file
   
-#Stats
 
+"""
+    Saves and writes the logs and processes output to a file.
+
+    :param file: list of processes and their data
+    :type: list of dictionaries
+    :param log: list of the logs from running the processes
+    :type: list of strings
+    :return: a file with all the logs and process
+    :rtype: file
+    """
 def saveFiles(file, log):
     print("Enter a name for the file to save the results to")
     output = input()
@@ -31,10 +60,19 @@ def saveFiles(file, log):
             f.write("%s\n" % line)
     print("Saved to", output)
 
+    """
+    Main menu to start and the code.
+
+    :param: None
+    :type: None
+    :return: None
+    :rtype: None
+    """
 def termRun():
     algorithim = 0
     file = None
     log = []
+    #Entry parameters to be set
     print("Enter Simulation Mode as integer: Auto(0) or Manual(1)")
     mode = int(input())
     if mode != 1 and mode != 0:
@@ -47,7 +85,7 @@ def termRun():
     
     print("Enter Time Slice for RR:")
     timeSlice = int(input())
-
+    #Main Menu
     while(True):
         os.system('clear')
         print("--------------------------------------------------")
@@ -78,15 +116,17 @@ def termRun():
         print("5. Quit")
         print("--------------------------------------------------")
         selection = int(input())
-        
+        #Match Case to pick which option from menu
         match(selection):
             case 1: 
+                #Enter demo file
                 print("Enter A Test File")
                 file = input()
                 file = fileOpen(file)
 
             case 2:
-                print("Select an Algorthim")
+                #Which algorithm to run the process on
+                print("Select an algorithm")
                 print("FCFS: 0 (Default)")
                 print("SJF: 1")
                 print("PS: 2")
@@ -106,8 +146,10 @@ def termRun():
                         print("RR selected")
                         
             case 3:
+                #Run the processes
                 log, file = scheduler(file, log, mode, simTime)
             case 4:
+                #Save the output
                 saveFiles(file, log)
             case 5:
                 break
@@ -240,7 +282,6 @@ def scheduler(file, algorithim, sim, simTime):
                                 if oiTime[0] == 0:
                                     oiTime.pop(0)
                                 
-
                     if oiTime != [] and file[p].get("State") == "Running":
                         file[p].update({'State': "Waiting"})
                         log.append(file[p].get("name") + " was added to the waiting queue for the IO")
@@ -257,9 +298,9 @@ def scheduler(file, algorithim, sim, simTime):
                         #print(file[p].get("name") + " was added to terminated queue")
 
                         if simTime == 1:
-                            file[p].update({'arrivalTime': str(file[p].get("arrival"))+"ms" })
+                            file[p].update({'arrivalTime': str(0)+"ms" })
                             file[p].update({'finishTime': str(systemTime) + "ms"})
-                            file[p].update({'turnAround': str((systemTime - file[p].get("arrival")))+"ms"})
+                            file[p].update({'turnAround': str((systemTime))+"ms"})
                             
                             for q in range(len(saved)):
                                 if saved[q].get("ID") == file[p].get("PID"):
@@ -268,13 +309,13 @@ def scheduler(file, algorithim, sim, simTime):
                             file[p].update({'waitTime': str((systemTime / totalBurst)) + "ms"})
                             file[p].update({'IOwaitTime': str(0)+"ms"})
                         elif simTime == 0:
-                            file[p].update({'arrivalTime': str(file[p].get("arrival")/1000.0)+"s" })
+                            file[p].update({'arrivalTime': str(0)+"s" })
                             file[p].update({'finishTime': str((systemTime)/1000.0) + "s"})
-                            file[p].update({'turnAround': str((systemTime - file[p].get("arrival"))/1000.0)+"s"})
+                            file[p].update({'turnAround': str((systemTime)/1000.0)+"s"})
                             for q in range(len(saved)):
                                 if saved[q].get("ID") == file[p].get("PID"):
                                     totalBurst = saved[q].get("CPUTimes") + totalBurst
-                            file[p].update({'waitTime': str((systemTime - file[p].get("arrival") / totalBurst)/1000.0) + "s"})
+                            file[p].update({'waitTime': str((systemTime / totalBurst)/1000.0) + "s"})
                             file[p].update({'IOwaitTime': str(0)+ "s"})
                         #"arrivalTime": None, "finishTime": None, "turnAround": None, "waitTime": None, "IOwaitTime": None}
                         schedulerPrint(file, [], [], (log))
@@ -380,22 +421,22 @@ def scheduler(file, algorithim, sim, simTime):
                         log.append(file[0].get("name") + " was added to terminated queue")
                         #print(file[p].get("name") + " was added to terminated queue")
                         if simTime == 1:
-                            file[0].update({'arrivalTime': str(file[p].get("arrival"))+"ms" })
+                            file[0].update({'arrivalTime': "0ms" })
                             file[0].update({'finishTime': str(systemTime) + "ms"})
                             file[0].update({'turnAround': str(systemTime)+"ms"})
                             for q in range(len(saved)):
                                 if saved[q].get("ID") == file[0].get("PID"):
                                     totalBurst = saved[q].get("CPUTimes") + totalBurst
-                            file[0].update({'waitTime': str((systemTime - file[0].get("arrival")) / totalBurst) + "ms"})
+                            file[0].update({'waitTime': str((systemTime) / totalBurst) + "ms"})
                             file[0].update({'IOwaitTime': str(systemTime)+ "ms"})
                         if simTime == 0:
-                            file[p].update({'arrivalTime': str(file[0].get("arrival")/1000.0)+"s" })
+                            file[p].update({'arrivalTime': str(0)+"s" })
                             file[0].update({'finishTime': str(systemTime/1000.0) + "s"})
-                            file[0].update({'turnAround': str((systemTime - file[0].get("arrival"))/1000.0)+"s"})
+                            file[0].update({'turnAround': str((systemTime)/1000.0)+"s"})
                             for q in range(len(saved)):
                                 if saved[q].get("ID") == file[0].get("PID"):
                                     totalBurst = saved[q].get("CPUTimes") + totalBurst
-                            file[0].update({'waitTime': str((((systemTime - file[0].get("arrival"))) / totalBurst)/1000.0) + "s"})
+                            file[0].update({'waitTime': str((((systemTime)) / totalBurst)/1000.0) + "s"})
                             file[0].update({'IOwaitTime': str(0) + "s"})
                         schedulerPrint(file, [], [], (log))
                         break
@@ -486,8 +527,7 @@ def RR(queue, Quantum):
     return readyQueue
 #print((fileOpen("TestFiles/test1.txt")))
 #print((PS(fileOpen("TestFiles/test1.txt"))))
-#print((fileOpen("TestFiles/test1.txt"))[1].get("State"))
-scheduler((fileOpen("TestFiles/testio.txt")), 1, 0, 1)
+#print((fileOpen("TestFiles/test1.txt"))[1].get("State")
 #print(RR(fileOpen("TestFiles/test1.txt")))
 #termRun()
-
+scheduler((fileOpen("TestFiles/testio.txt")), 1, 0, 1)
